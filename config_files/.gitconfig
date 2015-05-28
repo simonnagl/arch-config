@@ -1,0 +1,9 @@
+[user]
+	email = simonnagl@aim.com
+	name = Simon Nagl
+[push]
+	default = simple
+[color]
+	ui = auto
+[core]
+	editor = vim

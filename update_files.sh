@@ -18,6 +18,7 @@
 # Set default options
 file_path_list='file_path_list'; # -c
 only_update_file=''; # -f
+config_files_folder_rel_to_script='config_files'
 decree='';
 
 
@@ -40,35 +41,34 @@ print_usage() {
 	sed -n '/^$/q; /# /s/# //p' "$0"
 }
 
-# TODO: Maby update is not the right name
-update() {
-	# TODO: Find right path
-	gatherd_filename=$current_filename
+run() {
+	gatherd_filename=`dirname $0`/$config_files_folder_rel_to_script/`basename $current_filename`
 	case $decree in
 		"check")
-			update_check
+			run_check
 			;;
 		"out")
-			update_out
+			run_out
 			;;
 		"in")
-			update_in
+			run_in
 			;;
 	esac
 }
-update_check() {
+run_check() {
 
-	if ! diff $current_filename $gatherd_filename
+	if ! diff $current_filename $gatherd_filename > /dev/null
 	then
 		#TODO Add a description where the file changed
 		echo "$current_filename has changed somwhere"
 	fi
 }
-update_out() {
+run_out() {
 	echo "update $current_filename"
+	# TODO: Run with sudo if required
 	cp $gatherd_filename $current_filename
 }
-update_in() {
+run_in() {
 	echo "refresh $current_filename"
 	cp $current_filename $gatherd_filename
 }
@@ -123,11 +123,11 @@ then
 		if [ ! -z $line ]
 		then
 			current_filename=$line
-			update
+			run
 		fi
 	done <$file_path_list
 else
 	# If yes, process decree for it.
 	current_filename=$only_update_file
-	update
+	run
 fi
